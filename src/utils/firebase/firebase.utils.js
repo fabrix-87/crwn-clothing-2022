@@ -9,7 +9,16 @@ import {
   onAuthStateChanged
 } from 'firebase/auth';
 
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  collection,
+  writeBatch,
+  query,
+  getDocs
+} from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -21,7 +30,8 @@ const firebaseConfig = {
   appId: "1:326158371539:web:7abefb40421f074e3b6226"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
+//const firebaseApp = initializeApp(firebaseConfig);
 
 const provider = new GoogleAuthProvider();
 
@@ -74,3 +84,37 @@ export const signInAuthUserWithMailAndPassword = async (email, password) => {
 export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
+
+export const getCategoriesAndProducts = async () => {
+  const collectionRef = collection(db, 'categories');
+  const q = query(collectionRef);
+
+  const querySnapshot = await getDocs(q);
+
+  const categoryMap = querySnapshot.docs.reduce( (acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
+    acc[title.toLowerCase()] = items;
+    return acc;
+  },{})
+
+  return categoryMap;
+}
+
+
+/* Aggiungere dati al db */
+export const addCollectionAndDocuments = async (collectionKey, objectToAdd) => {
+  //riferimento collezione
+  const collectionRef = collection(db, collectionKey);
+
+  // si crea un batch nel caso ci siano errori si torna indietro
+  const batch = writeBatch(db);
+
+  objectToAdd.forEach(object => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
+  });
+
+  // si fa il commit alla fine 
+  await batch.commit();
+  console.log('done');
+}
