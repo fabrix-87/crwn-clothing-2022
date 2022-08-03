@@ -1,19 +1,48 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import CustomButton from '../custom-button/custom-button.component';
-import FormInput from '../form-input/form-input.componet';
+import FormInput from '../form-input/form-input.component';
 
 import './sign-in-form.styles.scss'
-import { emailSignInStart, googleSignInStart } from '../../redux/user/user.actions';
-import { connect } from 'react-redux';
+//import { emailSignInStart, googleSignInStart } from '../../redux/user/user.actions';
+//import { connect } from 'react-redux';
+import { signInWithGooglePopup, signInAuthUserWithMailAndPassword } from '../../utils/firebase/firebase.utils';
 
-const SignIn = ({emailSignInStart, googleSignInStart}) => {
-    const [userCredentials, setCredentials] = useState({ email: '', password: ''});
-    
+const defaultFormFields = {
+    email: '',
+    password: ''
+}
+
+//const SignInForm = ({emailSignInStart, googleSignInStart}) => {
+const SignInForm = () => {
+    const [userCredentials, setCredentials] = useState(defaultFormFields);       
     const {email, password} = userCredentials;
+
+    const signInWithGoogle = async () => {
+        await signInWithGooglePopup();        
+    };
 
     const handleSubmit = async event => {
         event.preventDefault();
-        emailSignInStart(email, password)
+
+        try{
+            await signInAuthUserWithMailAndPassword(email, password)
+            resetFormFields();
+        }catch(error){   
+            switch(error.code){
+                case 'auth/wrong-password':
+                    alert('Password errata');
+                    break;
+                case 'auth/user-not-found':
+                    alert('Utente non trovato');
+                    break;
+                default:
+                    console.error('Errore nella creazione dell\'utente: ', error);
+            }   
+        }             
+    }
+
+    const resetFormFields = () => {
+        setCredentials(defaultFormFields);
     }
 
     const handleChange = event => {
@@ -47,7 +76,7 @@ const SignIn = ({emailSignInStart, googleSignInStart}) => {
                     <CustomButton type="submit">Sign In</CustomButton>
                     <CustomButton 
                         customClass="google-sign-in" 
-                        onClick={googleSignInStart} 
+                        onClick={signInWithGoogle} 
                         type="button">Sign In With Google</CustomButton>
                 </div>
             </form>
@@ -56,9 +85,13 @@ const SignIn = ({emailSignInStart, googleSignInStart}) => {
 
 }
 
+/*
 const mapDispatchToProps = dispatch => ({
     googleSignInStart: () => dispatch(googleSignInStart()),
     emailSignInStart: (email, password) => dispatch(emailSignInStart({email, password}))
   })
 
 export default connect(null, mapDispatchToProps)(SignIn)
+*/
+
+export default SignInForm;

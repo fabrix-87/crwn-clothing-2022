@@ -3,7 +3,10 @@ import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
 } from 'firebase/auth';
 
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
@@ -61,3 +64,13 @@ export const createAuthUserWithMailAndPassword = async (email, password) => {
 
   return await createUserWithEmailAndPassword(auth, email, password);
 }
+
+export const signInAuthUserWithMailAndPassword = async (email, password) => {
+  if(!email || !password) return false;
+
+  return await signInWithEmailAndPassword(auth, email, password);
+}
+
+export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
