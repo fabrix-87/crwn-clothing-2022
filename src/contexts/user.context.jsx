@@ -1,14 +1,43 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import { createUserDocumentFromAuth, onAuthStateChangedListener } from "../utils/firebase/firebase.utils";
+import { createAction } from "../utils/reducer/reducer.utils";
 
 export const UserContext = createContext({
     currentUser: null,
     setCurrentUser: () => null
 })
 
+export const USER_ACTION_TYPES = {
+    'SET_CURRENT_USER': 'SET_CURRENT_USER'
+}
+
+const userReducer = (state, action) => {
+    const { type, payload } = action;
+
+    switch(type){
+        case USER_ACTION_TYPES.SET_CURRENT_USER:
+            return {
+                ...state,
+                currentUser: payload
+            }
+        default:
+            throw new Error(`Comando ${type} non presente in userRecuder`);
+    }         
+}
+
+const INITAL_STATE = {
+    currentUser: null
+}
 
 export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState(null);
+    //const [currentUser, setCurrentUser] = useState(null);
+
+    const [{currentUser}, dispatch] = useReducer(userReducer, INITAL_STATE);
+
+    const setCurrentUser = (user) => {
+        dispatch(createAction(USER_ACTION_TYPES.SET_CURRENT_USER, user));
+    }
+    
     const value = {currentUser, setCurrentUser}
 
     useEffect( () => {
