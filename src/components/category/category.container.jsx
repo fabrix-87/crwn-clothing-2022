@@ -1,14 +1,14 @@
 import WithSpinner from '../with-spinner/with-spinner.component'
 import Category from './category.component'
 
-import { useContext } from 'react';
-import { CategoriesContext } from '../../contexts/categories.context';
 import { useParams } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
+import { getCategoriesLoaded, getCategoriesMap } from '../../store/categories/categories.selectors';
 
 const CategoryContainer = () => {
     const {categoryId} = useParams();
-    const {categoriesMap, categoriesLoaded} = useContext(CategoriesContext);
+    const categoriesMap = useSelector(getCategoriesMap);
+    const categoriesLoaded = useSelector(getCategoriesLoaded);    
 
     if(!categoriesLoaded) return (<WithSpinner/>);
     return (<Category categoryTitle={categoryId} items={categoriesMap[categoryId]}/>);
