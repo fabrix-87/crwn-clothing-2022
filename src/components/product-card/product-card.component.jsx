@@ -1,6 +1,5 @@
-import {useContext} from 'react'
-import { CartContex } from '../../contexts/cart.context'
-
+import { useDispatch } from 'react-redux';
+import { addCartItem } from '../../store/cart/cart.slice';
 import {
     CollectionImageContainer,
     CollectionItemContainer,
@@ -11,9 +10,10 @@ import {
 } from './product-card.styles'
 
 const ProductCard = ({item}) => {
-
     const { imageUrl, name, price} = item;
-    const {addItem} = useContext(CartContex);
+    
+    const dispatch = useDispatch();
+    const addItem = (item) => dispatch(addCartItem(item));
 
     return (
         <CollectionItemContainer>

@@ -1,13 +1,14 @@
-import React, { useContext } from 'react'
+import { useSelector } from 'react-redux';
 //import StripeCheckoutButton from '../../components/stripe-button/stripe-button.component';
 import CheckoutItem from '../../components/checkout-item/checkout-item.component';
 
-import { CartContex } from '../../contexts/cart.context'
+import { getCartItems, getCartTotal } from '../../store/cart/cart.selectors';
 
 import './checkout.styles.scss'
 
 const Checkout = () => {
-    const {cartItems, cartTotal} = useContext(CartContex);
+    const cartItems = useSelector(getCartItems);
+    const cartTotal = useSelector(getCartTotal);
 
     return(
         <div className='checkout-page'>

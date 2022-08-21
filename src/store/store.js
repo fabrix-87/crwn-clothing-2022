@@ -2,13 +2,30 @@ import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import { rootReducer } from './root-reducer';
 
+import storage from 'redux-persist/lib/storage'
+import {persistReducer, persistStore} from 'redux-persist';
+
+import thunk from 'redux-thunk';
+
 const middleWares = [
-    logger
+    thunk
 ];
 
 //export const store = createStore(rootReducer, undefined, composedEnchancers);
 
-export default configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middleWares),
+const persistConfig = {
+    key: 'root',
+    storage,
+    blacklist: ['user']
+}
+
+const persisterReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+    reducer: persisterReducer,
+    //middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middleWares),
+    middleware: middleWares,
+    devTools: process.env.NODE_ENV !== 'production',
 })
+
+export const persistor = persistStore(store);

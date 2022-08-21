@@ -1,13 +1,17 @@
-import {useContext} from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { CartContex } from '../../contexts/cart.context'
+import { getCartItems } from '../../store/cart/cart.selectors'
+import { toggleCartIcon } from '../../store/cart/cart.slice';
 import CartItem from '../cart-item/cart-item.component'
 import CustomButton from '../custom-button/custom-button.component'
 
 import './cart-dropdown.styles.scss'
 
 const CartDropdown = () => {
-    const {cartItems, toggleCartHidden} = useContext(CartContex);
+    const cartItems = useSelector(getCartItems);
+    
+    const dispatch = useDispatch();
+
     const navigate = useNavigate();
     
     return(
@@ -24,7 +28,7 @@ const CartDropdown = () => {
             <CustomButton 
             onClick={() =>{ 
                 navigate(`/checkout`)
-                toggleCartHidden()
+                dispatch(toggleCartIcon())
             }}>GO TO CHECKOUT</CustomButton>
         </div>
     )
